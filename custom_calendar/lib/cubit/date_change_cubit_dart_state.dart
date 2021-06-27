@@ -9,9 +9,11 @@ class DateChangeCubitDartState {
 
   DateChangeCubitDartState({required this.dateTime, required this.status});
 
-  factory DateChangeCubitDartState.init() {
+  factory DateChangeCubitDartState.initial() {
     return DateChangeCubitDartState(
-        dateTime: DateTime.now(), status: DateChangeCubitDartStatus.initial);
+      dateTime: DateTime.now(),
+      status: DateChangeCubitDartStatus.initial,
+    );
   }
 
   DateChangeCubitDartState copyWith({

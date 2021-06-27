@@ -23,9 +23,9 @@ class ViewByChoiceClass {
   static List<Widget> viewByMonth({required Brightness textColor}) {
     List<Widget> monthsList = [];
     int numberOfMonths = (frontLimitDate.year - backLimitDate.year) * 12;
-    for (int index = 1; index <= numberOfMonths; index++) {
-      final dateTime = DateTime(
-          backLimitDate.year, backLimitDate.month + index, backLimitDate.day);
+    for (int index = 0; index < numberOfMonths; index++) {
+      final dateTime = DateTime(backLimitDate.year,
+          backLimitDate.month + index + 1, backLimitDate.day);
 
       monthsList.add(MonthWidget(
         dateTime: dateTime,
@@ -39,9 +39,11 @@ class ViewByChoiceClass {
   static List<Widget> viewByYear({required Brightness textColor}) {
     List<Widget> yearList = [];
     int numberOfYears = (frontLimitDate.year - backLimitDate.year);
-    for (int index = 1; index <= numberOfYears; index++) {
+    for (int index = 0; index < numberOfYears; index++) {
       final dateTime = DateTime(
-          backLimitDate.year, backLimitDate.month + index, backLimitDate.day);
+          backLimitDate.year + index, backLimitDate.month, backLimitDate.day);
+
+      //print('created date :::::::::::: +++' + dateTime.toString());
 
       yearList.add(YearWidget(dateTime: dateTime, textColor: textColor));
     }

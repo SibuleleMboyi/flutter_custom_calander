@@ -1,4 +1,5 @@
 import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
+import 'package:custom_calendar/utils/constants.dart';
 import 'package:custom_calendar/widgtes/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       ),
       home: BlocProvider<DateChangeCubitDartCubit>(
         create: (_) => DateChangeCubitDartCubit(),
-        child: CalendarWidget(),
+        child: CalendarWidget(viewByChoice: ViewByChoices.viewByMonth),
       ),
     );
   }
