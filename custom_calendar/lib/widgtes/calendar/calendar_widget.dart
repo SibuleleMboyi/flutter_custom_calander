@@ -21,7 +21,6 @@ class CalendarWidget extends StatelessWidget {
     int trackPaging = 0;
     int oldIndex = -1;
     DateTime backLimitDate = Constants.backLimitDate;
-    DateTime frontLimitDate = Constants.frontLimitDate;
     DateTime currentDate = Constants.currentDate;
     List<Widget> results = ViewByChoiceClass.viewByChoice(
       choice: viewByChoice,
@@ -29,11 +28,15 @@ class CalendarWidget extends StatelessWidget {
     );
     List<String> dayNames = Constants.dayNames;
 
-    final initialPage = (((frontLimitDate.year - backLimitDate.year) * 12) -
-            ((frontLimitDate.year - currentDate.year) * 12)) +
-        currentDate.month -
-        2;
+    final int initialPage;
 
+    if (viewByChoice == ViewByChoices.viewByMonth) {
+      int x = (currentDate.year - backLimitDate.year) * 12;
+      initialPage = x + currentDate.month - 2;
+      print(initialPage);
+    } else {
+      initialPage = currentDate.year - backLimitDate.year;
+    }
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
         return Scaffold(
