@@ -1,5 +1,7 @@
+import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class MonthWidget extends StatelessWidget {
@@ -21,27 +23,149 @@ class MonthWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewPort = creatMonth(date: dateTime, textColor: textColor);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-      child: GridView.builder(
-          shrinkWrap: true,
-          itemCount: viewPort.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            mainAxisSpacing: mainAxisSpacing,
-            //mainAxisSpacing: 10,
-            crossAxisSpacing: 0,
-            crossAxisCount: 7,
-          ),
-          itemBuilder: (context, index) {
-            return viewPort[index];
-          }),
+
+    return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
+      builder: (context, state) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+          child: GridView.builder(
+              shrinkWrap: true,
+              itemCount: viewPort[1].length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                mainAxisSpacing: mainAxisSpacing,
+                //mainAxisSpacing: 10,
+                crossAxisSpacing: 0,
+                crossAxisCount: 7,
+              ),
+              itemBuilder: (context, index) {
+                int numb = 0;
+                bool isCurrentMonth = false;
+                if ((viewPort[1][index]) is! Text &&
+                    state.dateTime.day == viewPort[1][index]) {
+                  print('is not the same instance');
+                  numb = state.dateTime.day;
+                  //viewPort[1][index] = Text(index.toString());
+                }
+
+                if (Wrap is! Text) {
+                  print('is  same instance');
+                }
+                for (int i = 0; i < viewPort[1].length; i++) {
+                  if (viewPort[1][i] is! Text) {
+                    isCurrentMonth = true;
+                  }
+                }
+                return GestureDetector(
+                  onTap: () {
+                    //Text text = Text('Mandelaaaaaaaaaaaaaaaaaaaaaaa');
+                    // print(viewPort[0]);
+                    //print(viewPort[2]);
+
+                    print(' itemBuilder index is :' + index.toString());
+                    print('viewPort::::' + viewPort[0].toString());
+                    if ((index) <= (viewPort[0] - 1)) {
+                      print('Oops! out of the bounds');
+                    } else if ((index) >= (viewPort[1].length - viewPort[2])) {
+                      print('Oops! out of the END bounds');
+                    } else {
+                      context.read<DateChangeCubitDartCubit>().selectedDate(
+                            isSelected: true,
+                            index: index,
+                          ); // isSelected is initially 'false'. This sets it to 'true.
+                      print('seleced state index: ' + index.toString());
+                      context.read<DateChangeCubitDartCubit>().animWidget(
+                              widget: Container(
+                            decoration: BoxDecoration(
+                              //color: Colors.yellow,
+                              border: Border.all(color: Colors.green),
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: viewPort[1][index],
+                          )); //
+                    }
+                    print(state.selectedDate.day);
+
+                    /*   Container(
+                      decoration: BoxDecoration(
+                        //color: Colors.yellow,
+                        border: Border.all(color: Colors.green),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: viewPort[1][index],
+                    ); */
+                  },
+                  child: state.isSelected == false &&
+                          (viewPort[1][index]) is! Text &&
+                          state.selectedIndex != -1
+                      ? Container(
+                          decoration: BoxDecoration(
+                            //color: Colors.yellow,
+                            border: Border.all(color: Colors.green),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: viewPort[1][index],
+                        )
+                      : state.hasPaged == true &&
+                              ((viewPort[1][index]) is Text) &&
+                              (viewPort[1][index]).data ==
+                                  state.dateTime.day.toString() &&
+                              state.isSelected == false &&
+                              index < (viewPort[1].length - viewPort[2]) &&
+                              isCurrentMonth == false
+                          ? Container(
+                              decoration: BoxDecoration(
+                                //color: Colors.yellow,
+                                border: Border.all(color: Colors.green),
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: viewPort[1][index],
+                            )
+                          : state.hasPaged == true &&
+                                  ((viewPort[1][index]) is! Text) &&
+                                  state.isSelected == false &&
+                                  index < (viewPort[1].length - viewPort[2])
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    //color: Colors.yellow,
+                                    border: Border.all(color: Colors.green),
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                  child: viewPort[1][29],
+                                )
+                              : animatedGridCell(
+                                  widget: viewPort[1][index],
+                                  animatedWidget: state.animatedWidget,
+                                  stateDateTime: state.selectedDate,
+                                  isSelected: state.isSelected,
+                                  index: index,
+                                  stateIndex: state.selectedIndex,
+                                ),
+                );
+              }),
+        );
+      },
     );
+  }
+
+  Widget animatedGridCell({
+    required Widget widget,
+    required Widget animatedWidget,
+    required DateTime stateDateTime,
+    required bool isSelected,
+    required int index,
+    required int stateIndex,
+  }) {
+    if (index == stateIndex) {
+      return animatedWidget;
+    } else {
+      return widget;
+    }
   }
 
   // Create a Month
   // Appends visible previous month days into the viewport of this month, and color them grey.
   // Appends visible next month days into the viewport of this month, and color them grey.
-  List<Widget> creatMonth(
+  List<dynamic> creatMonth(
       {required DateTime date, required Brightness textColor}) {
     List<Widget> visiblePrevMonthDays = [];
     List<Widget> visibleNextMonthDays = [];
@@ -102,7 +226,9 @@ class MonthWidget extends StatelessWidget {
                 index.toString(),
                 style: TextStyle(
                   color: textColor == Brightness.light
-                      ? Colors.black
+                      ? trackLen % 7 == 0
+                          ? Colors.red[700]
+                          : Colors.black
                       : trackLen % 7 == 0
                           ? Colors.red[700]
                           : Colors.white,
@@ -135,6 +261,10 @@ class MonthWidget extends StatelessWidget {
       }
     }
 
-    return monthCheck + visibleNextMonthDays;
+    return [
+      visiblePrevMonthDays.length,
+      monthCheck + visibleNextMonthDays,
+      visibleNextMonthDays.length
+    ];
   }
 }

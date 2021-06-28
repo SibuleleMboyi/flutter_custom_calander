@@ -115,6 +115,18 @@ class CalendarWidget extends StatelessWidget {
                     context
                         .read<DateChangeCubitDartCubit>()
                         .dateChanged(newDate: currentDate);
+
+                    context
+                        .read<DateChangeCubitDartCubit>()
+                        .selectedDateFix(dateTime: currentDate);
+
+                    context
+                        .read<DateChangeCubitDartCubit>()
+                        .hasPaged(hasPaged: true);
+
+                    context
+                        .read<DateChangeCubitDartCubit>()
+                        .selectedDate(isSelected: false, index: -1);
                   },
                   children: results,
                 ),
