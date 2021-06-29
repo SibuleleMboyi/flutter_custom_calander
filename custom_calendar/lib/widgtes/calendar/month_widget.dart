@@ -9,26 +9,31 @@ class MonthWidget extends StatelessWidget {
   final DateTime dateTime;
   final double mainAxisSpacing;
   final double crossAxisSpacing;
+  final double leftPadding;
+  final double topPadding;
   final Brightness textColor;
   final ViewByChoices viewByChoices;
 
-  const MonthWidget(
-      {Key? key,
-      required this.dateTime,
-      this.mainAxisSpacing = 60.0,
-      this.crossAxisSpacing = 10,
-      this.viewByChoices = ViewByChoices.viewByMonth,
-      required this.textColor})
-      : super(key: key);
+  const MonthWidget({
+    Key? key,
+    required this.dateTime,
+    this.mainAxisSpacing = 60.0,
+    this.crossAxisSpacing = 10,
+    this.leftPadding = 30,
+    this.topPadding = 50,
+    this.viewByChoices = ViewByChoices.viewByMonth,
+    required this.textColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final viewPort = creatMonth(date: dateTime, textColor: textColor);
+    final viewPort = creatMonth(
+        date: dateTime, textColor: textColor, viewByChoices: viewByChoices);
 
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(30, 50, 0, 0),
+          padding: EdgeInsets.fromLTRB(leftPadding, topPadding, 0, 0),
           child: GridView.builder(
               shrinkWrap: true,
               itemCount: viewPort[1].length,
@@ -49,11 +54,13 @@ class MonthWidget extends StatelessWidget {
                   i += 1;
                 }
                 return GestureDetector(
-                  onTap: () => configureTappedDate(
-                    context: context,
-                    viewPort: viewPort,
-                    index: index,
-                  ),
+                  onTap: () => ViewByChoices.viewByMonth == viewByChoices
+                      ? configureTappedDate(
+                          context: context,
+                          viewPort: viewPort,
+                          index: index,
+                        )
+                      : {},
                   child: animatedGridCell(
                     widget: viewPort[1][index],
                     animatedWidget: state.animatedWidget,
@@ -65,6 +72,7 @@ class MonthWidget extends StatelessWidget {
                     isWithinMonth: index < (viewPort[1].length - viewPort[2]),
                     index: index,
                     stateIndex: state.selectedIndex,
+                    viewByMonth: ViewByChoices.viewByMonth == viewByChoices,
                   ),
                 );
               }),
@@ -84,19 +92,25 @@ class MonthWidget extends StatelessWidget {
     required bool isInstanceOfText,
     required bool isWithinMonth,
     required int stateIndex,
+    required bool viewByMonth,
   }) {
-    if (!isSelected && !isInstanceOfText && stateIndex != -1) {
+    if (!isSelected && !isInstanceOfText && stateIndex != -1 && viewByMonth) {
       return SelectedDateMarker(child: widget);
     } else if (!isSelected &&
         !isCurrentMonth &&
         isInstanceOfText &&
         stateDateTime.day.toString() == widget.data &&
         hasPaged &&
-        isWithinMonth) {
+        isWithinMonth &&
+        viewByMonth) {
       return SelectedDateMarker(child: widget);
-    } else if (!isSelected && hasPaged && !isInstanceOfText && isWithinMonth) {
+    } else if (!isSelected &&
+        hasPaged &&
+        !isInstanceOfText &&
+        isWithinMonth &&
+        viewByMonth) {
       return SelectedDateMarker(child: widget);
-    } else if (index == stateIndex) {
+    } else if (index == stateIndex && viewByMonth) {
       return animatedWidget;
     } else {
       return widget;
@@ -136,7 +150,9 @@ class MonthWidget extends StatelessWidget {
   // Appends visible previous month days into the viewport of this month, and color them grey.
   // Appends visible next month days into the viewport of this month, and color them grey.
   List<dynamic> creatMonth(
-      {required DateTime date, required Brightness textColor}) {
+      {required DateTime date,
+      required Brightness textColor,
+      required ViewByChoices viewByChoices}) {
     List<Widget> visiblePrevMonthDays = [];
     List<Widget> visibleNextMonthDays = [];
     List<Widget> currentMothDays = [];
@@ -160,7 +176,7 @@ class MonthWidget extends StatelessWidget {
             viewByChoices == ViewByChoices.viewByMonth
                 ? (patchFrom + index).toString()
                 : '',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(fontSize: 15, color: Colors.grey),
           ),
         );
       }
@@ -191,6 +207,9 @@ class MonthWidget extends StatelessWidget {
                       index.toString(),
                       style: TextStyle(
                         color: Colors.white,
+                        fontSize: ViewByChoices.viewByMonth == viewByChoices
+                            ? 15
+                            : 10,
                       ),
                     ),
                   ),
@@ -199,6 +218,8 @@ class MonthWidget extends StatelessWidget {
             : Text(
                 index.toString(),
                 style: TextStyle(
+                  fontSize:
+                      ViewByChoices.viewByMonth == viewByChoices ? 15 : 10,
                   color: textColor == Brightness.light
                       ? trackLen % 7 == 0
                           ? Colors.red[700]
@@ -223,7 +244,7 @@ class MonthWidget extends StatelessWidget {
           check % 7 == 0
               ? Text(
                   index.toString(),
-                  style: TextStyle(color: Colors.red[300]),
+                  style: TextStyle(fontSize: 15, color: Colors.red[300]),
                 )
               : Text(
                   index.toString(),

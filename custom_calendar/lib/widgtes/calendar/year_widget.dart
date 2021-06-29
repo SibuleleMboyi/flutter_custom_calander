@@ -22,10 +22,14 @@ class YearWidget extends StatelessWidget {
     //print('senddddddddd +++++++' + dateTime.toString());
 
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      //physics: NeverScrollableScrollPhysics(),
       itemCount: 12,
+      shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisSpacing: 10,
+        mainAxisSpacing: 40,
+        childAspectRatio:
+            0.9, // controlls the size of each grid element or item
         //mainAxisSpacing: 0,
         crossAxisCount: 3,
       ),
@@ -63,12 +67,19 @@ class YearWidget extends StatelessWidget {
                     crossAxisCount: 7,
                   ),
                   itemBuilder: (context, index) {
-                    return Text(dayNames[index]);
+                    return Text(
+                      dayNames[index],
+                      style: TextStyle(
+                        fontSize: 10,
+                      ),
+                    );
                   }),
             ),
             MonthWidget(
               dateTime: date,
               mainAxisSpacing: 0,
+              topPadding: 40,
+              leftPadding: 0,
               textColor: textColor,
               crossAxisSpacing: 5,
               viewByChoices: ViewByChoices.viewByYear,
