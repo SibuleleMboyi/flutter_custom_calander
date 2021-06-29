@@ -31,7 +31,7 @@ class DateChangeCubitDartState {
       dateTime: Constants.currentDate, //DateTime.now(),
       isSelected: false,
       hasPaged: false,
-      selectedIndex: 0,
+      selectedIndex: -2,
       selectedDate: Constants.currentDate, //DateTime.now(),
       animatedWidget: SizedBox.shrink(),
       isPrevMonthDay: false,

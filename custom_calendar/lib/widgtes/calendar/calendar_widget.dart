@@ -1,12 +1,12 @@
+import 'package:custom_calendar/classes/classes.dart';
 import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
-import 'package:custom_calendar/widgtes/calendar/view_by_choice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class CalendarWidget extends StatelessWidget {
+class CalendarWidget extends StatefulWidget {
   final ViewByChoices viewByChoice;
 
   const CalendarWidget({
@@ -15,22 +15,21 @@ class CalendarWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    print(ViewByChoices.viewByMonth);
-    final checkColor = MediaQuery.platformBrightnessOf(context);
-    int trackPaging = 0;
+  _CalendarWidgetState createState() => _CalendarWidgetState();
+}
 
-    DateTime backLimitDate = Constants.backLimitDate;
-    DateTime currentDate = Constants.currentDate;
-    List<Widget> results = ViewByChoiceClass.viewByChoice(
-      choice: viewByChoice,
-      textColor: MediaQuery.platformBrightnessOf(context),
-    );
-    List<String> dayNames = Constants.dayNames;
+class _CalendarWidgetState extends State<CalendarWidget> {
+  DateTime backLimitDate = Constants.backLimitDate;
+  DateTime currentDate = Constants.currentDate;
+  List<String> dayNames = Constants.dayNames;
 
-    final int initialPage;
+  int initialPage = 0;
+  int trackPaging = 0;
+  int oldIndex = 0;
+  late PageController _controller;
 
-    if (viewByChoice == ViewByChoices.viewByMonth) {
+  void initializeController() {
+    if (widget.viewByChoice == ViewByChoices.viewByMonth) {
       int x = (currentDate.year - backLimitDate.year) * 12;
       initialPage = x + currentDate.month - 2;
 
@@ -38,9 +37,27 @@ class CalendarWidget extends StatelessWidget {
     } else {
       initialPage = currentDate.year - backLimitDate.year;
     }
-    int oldIndex = initialPage;
-    final _controller = PageController(initialPage: initialPage);
+    _controller = PageController(initialPage: initialPage);
+    oldIndex = initialPage;
+  }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //print(ViewByChoices.viewByMonth);
+    final checkColor = MediaQuery.platformBrightnessOf(context);
+
+    List<Widget> results = ViewByChoiceClass.viewByChoice(
+      choice: widget.viewByChoice,
+      textColor: checkColor,
+    );
+
+    initializeController();
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
         if (state.isPrevMonthDay == true) {
@@ -68,7 +85,7 @@ class CalendarWidget extends StatelessWidget {
             backgroundColor: checkColor == Brightness.light
                 ? Colors.grey[200]
                 : Colors.black,
-            title: viewByChoice == ViewByChoices.viewByMonth
+            title: widget.viewByChoice == ViewByChoices.viewByMonth
                 ? Text(state.dateTime.year.toString() +
                     ' ' +
                     DateFormat.MMM().format(state.dateTime))
@@ -88,7 +105,7 @@ class CalendarWidget extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                viewByChoice == ViewByChoices.viewByMonth
+                widget.viewByChoice == ViewByChoices.viewByMonth
                     ? Padding(
                         padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
                         child: GridView.builder(
@@ -107,18 +124,21 @@ class CalendarWidget extends StatelessWidget {
                   controller: _controller,
                   onPageChanged: (index) {
                     if (index > oldIndex) {
-                      trackPaging = viewByChoice == ViewByChoices.viewByMonth
-                          ? currentDate.month + 1
-                          : currentDate.year + 1;
+                      trackPaging =
+                          widget.viewByChoice == ViewByChoices.viewByMonth
+                              ? currentDate.month + 1
+                              : currentDate.year + 1;
                     } else {
-                      trackPaging = viewByChoice == ViewByChoices.viewByMonth
-                          ? currentDate.month - 1
-                          : currentDate.year - 1;
+                      trackPaging =
+                          widget.viewByChoice == ViewByChoices.viewByMonth
+                              ? currentDate.month - 1
+                              : currentDate.year - 1;
                     }
                     oldIndex = index;
-                    currentDate = viewByChoice == ViewByChoices.viewByMonth
-                        ? DateTime(currentDate.year, trackPaging, 01)
-                        : DateTime(trackPaging, 01, 01);
+                    currentDate =
+                        widget.viewByChoice == ViewByChoices.viewByMonth
+                            ? DateTime(currentDate.year, trackPaging, 01)
+                            : DateTime(trackPaging, 01, 01);
 
                     print(trackPaging);
                     context

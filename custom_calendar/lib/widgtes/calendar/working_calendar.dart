@@ -40,6 +40,11 @@ class MonthWidget extends StatelessWidget {
               ),
               itemBuilder: (context, index) {
                 bool isCurrentMonth = false;
+                /*   if ((viewPort[1][index]) is! Text &&
+                    state.dateTime.day == viewPort[1][index]) {
+                  print('is not the same instance');
+                  
+                } */
 
                 int i = 0;
                 while (isCurrentMonth == false && i < viewPort[1].length) {
@@ -49,23 +54,60 @@ class MonthWidget extends StatelessWidget {
                   i += 1;
                 }
                 return GestureDetector(
-                  onTap: () => configureTappedDate(
-                    context: context,
-                    viewPort: viewPort,
-                    index: index,
-                  ),
-                  child: animatedGridCell(
-                    widget: viewPort[1][index],
-                    animatedWidget: state.animatedWidget,
-                    stateDateTime: state.selectedDate,
-                    isSelected: state.isSelected,
-                    hasPaged: state.hasPaged,
-                    isCurrentMonth: isCurrentMonth,
-                    isInstanceOfText: (viewPort[1][index]) is Text,
-                    isWithinMonth: index < (viewPort[1].length - viewPort[2]),
-                    index: index,
-                    stateIndex: state.selectedIndex,
-                  ),
+                  onTap: () {
+                    if ((index) <= (viewPort[0] - 1)) {
+                      //print('checks if tapping visible previous months days');
+                      context.read<DateChangeCubitDartCubit>().isPrevMonthDay(
+                            isPrevMonthDay: true,
+                          );
+                    } else if ((index) >= (viewPort[1].length - viewPort[2])) {
+                      //print('checks if tapping visible next months days');
+                      context.read<DateChangeCubitDartCubit>().isNextMonthDay(
+                            isNextMonthDay: true,
+                          );
+                    } else {
+                      context.read<DateChangeCubitDartCubit>().selectedDate(
+                            isSelected: true,
+                            index: index,
+                          ); // isSelected is initially 'false'. This sets it to 'true.
+
+                      context.read<DateChangeCubitDartCubit>().animWidget(
+                            widget:
+                                SelectedDateMarker(child: viewPort[1][index]),
+                          ); //
+                    }
+                  },
+                  child: state.isSelected == false &&
+                          (viewPort[1][index]) is! Text &&
+                          state.selectedIndex != -1
+                      ? SelectedDateMarker(child: viewPort[1][index])
+                      : state.hasPaged == true &&
+                              ((viewPort[1][index]) is Text) &&
+                              (viewPort[1][index]).data ==
+                                  state.dateTime.day.toString() &&
+                              state.isSelected == false &&
+                              index < (viewPort[1].length - viewPort[2]) &&
+                              isCurrentMonth == false
+                          ? SelectedDateMarker(child: viewPort[1][index])
+                          : state.hasPaged == true &&
+                                  ((viewPort[1][index]) is! Text) &&
+                                  state.isSelected == false &&
+                                  index < (viewPort[1].length - viewPort[2])
+                              ? SelectedDateMarker(child: viewPort[1][index])
+                              : animatedGridCell(
+                                  widget: viewPort[1][index],
+                                  animatedWidget: state.animatedWidget,
+                                  stateDateTime: state.selectedDate,
+                                  isSelected: state.isSelected,
+                                  hasPaged: state.hasPaged,
+                                  isCurrentMonth: isCurrentMonth,
+                                  isInstanceOfText:
+                                      (viewPort[1][index]) is! Text,
+                                  isWithinMonth: index <
+                                      (viewPort[1].length - viewPort[2]),
+                                  index: index,
+                                  stateIndex: state.selectedIndex,
+                                ),
                 );
               }),
         );
@@ -74,7 +116,7 @@ class MonthWidget extends StatelessWidget {
   }
 
   Widget animatedGridCell({
-    required dynamic widget,
+    required Widget widget,
     required Widget animatedWidget,
     required DateTime stateDateTime,
     required bool isSelected,
@@ -85,50 +127,10 @@ class MonthWidget extends StatelessWidget {
     required bool isWithinMonth,
     required int stateIndex,
   }) {
-    if (!isSelected && !isInstanceOfText && stateIndex != -1) {
-      return SelectedDateMarker(child: widget);
-    } else if (!isSelected &&
-        !isCurrentMonth &&
-        isInstanceOfText &&
-        stateDateTime.day.toString() == widget.data &&
-        hasPaged &&
-        isWithinMonth) {
-      return SelectedDateMarker(child: widget);
-    } else if (!isSelected && hasPaged && !isInstanceOfText && isWithinMonth) {
-      return SelectedDateMarker(child: widget);
-    } else if (index == stateIndex) {
+    if (index == stateIndex) {
       return animatedWidget;
     } else {
       return widget;
-    }
-  }
-
-  void configureTappedDate({
-    required BuildContext context,
-    required List viewPort,
-    required int index,
-  }) {
-    if ((index) <= (viewPort[0] - 1)) {
-      //print('checks if tapping visible previous month's days');
-      context.read<DateChangeCubitDartCubit>().isPrevMonthDay(
-            isPrevMonthDay: true,
-          );
-    } else if ((index) >= (viewPort[1].length - viewPort[2])) {
-      //print('checks if tapping visible next month's days');
-      context.read<DateChangeCubitDartCubit>().isNextMonthDay(
-            isNextMonthDay: true,
-          );
-    } else {
-      //selected date is within the current month.
-      // takes the current tapped index
-      context.read<DateChangeCubitDartCubit>().selectedDate(
-            isSelected: true,
-            index: index,
-          );
-
-      context.read<DateChangeCubitDartCubit>().animWidget(
-            widget: SelectedDateMarker(child: viewPort[1][index]),
-          );
     }
   }
 
