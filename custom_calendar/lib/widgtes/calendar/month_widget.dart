@@ -27,7 +27,7 @@ class MonthWidget extends StatelessWidget {
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+          padding: const EdgeInsets.fromLTRB(30, 50, 0, 0),
           child: GridView.builder(
               shrinkWrap: true,
               itemCount: viewPort[1].length,
@@ -38,18 +38,13 @@ class MonthWidget extends StatelessWidget {
                 crossAxisCount: 7,
               ),
               itemBuilder: (context, index) {
-                int numb = 0;
                 bool isCurrentMonth = false;
-                if ((viewPort[1][index]) is! Text &&
+                /*   if ((viewPort[1][index]) is! Text &&
                     state.dateTime.day == viewPort[1][index]) {
                   print('is not the same instance');
-                  numb = state.dateTime.day;
-                  //viewPort[1][index] = Text(index.toString());
-                }
+                  
+                } */
 
-                if (Wrap is! Text) {
-                  print('is  same instance');
-                }
                 for (int i = 0; i < viewPort[1].length; i++) {
                   if (viewPort[1][i] is! Text) {
                     isCurrentMonth = true;
@@ -57,22 +52,22 @@ class MonthWidget extends StatelessWidget {
                 }
                 return GestureDetector(
                   onTap: () {
-                    //Text text = Text('Mandelaaaaaaaaaaaaaaaaaaaaaaa');
-                    // print(viewPort[0]);
-                    //print(viewPort[2]);
-
-                    print(' itemBuilder index is :' + index.toString());
-                    print('viewPort::::' + viewPort[0].toString());
                     if ((index) <= (viewPort[0] - 1)) {
-                      print('Oops! out of the bounds');
+                      //print('checks if tapping visible previous months days');
+                      context.read<DateChangeCubitDartCubit>().isPrevMonthDay(
+                            isPrevMonthDay: true,
+                          );
                     } else if ((index) >= (viewPort[1].length - viewPort[2])) {
-                      print('Oops! out of the END bounds');
+                      //print('checks if tapping visible next months days');
+                      context.read<DateChangeCubitDartCubit>().isNextMonthDay(
+                            isNextMonthDay: true,
+                          );
                     } else {
                       context.read<DateChangeCubitDartCubit>().selectedDate(
                             isSelected: true,
                             index: index,
                           ); // isSelected is initially 'false'. This sets it to 'true.
-                      print('seleced state index: ' + index.toString());
+
                       context.read<DateChangeCubitDartCubit>().animWidget(
                               widget: Container(
                             decoration: BoxDecoration(
@@ -83,23 +78,12 @@ class MonthWidget extends StatelessWidget {
                             child: viewPort[1][index],
                           )); //
                     }
-                    print(state.selectedDate.day);
-
-                    /*   Container(
-                      decoration: BoxDecoration(
-                        //color: Colors.yellow,
-                        border: Border.all(color: Colors.green),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: viewPort[1][index],
-                    ); */
                   },
                   child: state.isSelected == false &&
                           (viewPort[1][index]) is! Text &&
                           state.selectedIndex != -1
                       ? Container(
                           decoration: BoxDecoration(
-                            //color: Colors.yellow,
                             border: Border.all(color: Colors.green),
                             borderRadius: BorderRadius.circular(20.0),
                           ),
@@ -114,7 +98,6 @@ class MonthWidget extends StatelessWidget {
                               isCurrentMonth == false
                           ? Container(
                               decoration: BoxDecoration(
-                                //color: Colors.yellow,
                                 border: Border.all(color: Colors.green),
                                 borderRadius: BorderRadius.circular(20.0),
                               ),
@@ -126,7 +109,6 @@ class MonthWidget extends StatelessWidget {
                                   index < (viewPort[1].length - viewPort[2])
                               ? Container(
                                   decoration: BoxDecoration(
-                                    //color: Colors.yellow,
                                     border: Border.all(color: Colors.green),
                                     borderRadius: BorderRadius.circular(20.0),
                                   ),
@@ -196,14 +178,20 @@ class MonthWidget extends StatelessWidget {
       }
     }
     final monthCheck = visiblePrevMonthDays + currentMothDays;
+
     print(date);
-    final currentDate = DateTime.now();
+    print(Constants.currentDate);
+
     int trackLen = 0;
     for (int index = 1; index <= currentMonthNumOfDays; index++) {
       trackLen = monthCheck.length + 1;
       monthCheck.add(
         DateTime(date.year, date.month, index) ==
-                DateTime(currentDate.year, currentDate.month, currentDate.day)
+                DateTime(
+                  Constants.currentDate.year,
+                  Constants.currentDate.month,
+                  Constants.currentDate.day,
+                )
             ? Wrap(
                 children: [
                   Container(

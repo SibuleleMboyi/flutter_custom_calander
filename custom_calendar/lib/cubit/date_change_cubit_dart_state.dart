@@ -10,6 +10,8 @@ class DateChangeCubitDartState {
   final int selectedIndex;
   final DateTime selectedDate;
   final Widget animatedWidget;
+  final bool isPrevMonthDay;
+  final bool isNextMonthDay;
   final DateChangeCubitDartStatus status;
 
   DateChangeCubitDartState({
@@ -19,17 +21,21 @@ class DateChangeCubitDartState {
     required this.selectedIndex,
     required this.selectedDate,
     required this.animatedWidget,
+    required this.isPrevMonthDay,
+    required this.isNextMonthDay,
     required this.status,
   });
 
   factory DateChangeCubitDartState.initial() {
     return DateChangeCubitDartState(
-      dateTime: DateTime.now(),
+      dateTime: Constants.currentDate, //DateTime.now(),
       isSelected: false,
       hasPaged: false,
       selectedIndex: 0,
-      selectedDate: DateTime.now(),
+      selectedDate: Constants.currentDate, //DateTime.now(),
       animatedWidget: SizedBox.shrink(),
+      isPrevMonthDay: false,
+      isNextMonthDay: false,
       status: DateChangeCubitDartStatus.initial,
     );
   }
@@ -41,6 +47,8 @@ class DateChangeCubitDartState {
     int? selectedIndex,
     DateTime? selectedDate,
     Widget? animatedWidget,
+    bool? isPrevMonthDay,
+    bool? isNextMonthDay,
     DateChangeCubitDartStatus? status,
   }) {
     return DateChangeCubitDartState(
@@ -50,6 +58,8 @@ class DateChangeCubitDartState {
       selectedIndex: selectedIndex ?? this.selectedIndex,
       selectedDate: selectedDate ?? this.selectedDate,
       animatedWidget: animatedWidget ?? this.animatedWidget,
+      isPrevMonthDay: isPrevMonthDay ?? this.isPrevMonthDay,
+      isNextMonthDay: isNextMonthDay ?? this.isNextMonthDay,
       status: status ?? this.status,
     );
   }

@@ -33,14 +33,23 @@ class CalendarWidget extends StatelessWidget {
     if (viewByChoice == ViewByChoices.viewByMonth) {
       int x = (currentDate.year - backLimitDate.year) * 12;
       initialPage = x + currentDate.month - 2;
+
       print(initialPage);
     } else {
       initialPage = currentDate.year - backLimitDate.year;
     }
     int oldIndex = initialPage;
+    final _controller = PageController(initialPage: initialPage);
 
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
+        if (state.isPrevMonthDay == true) {
+          _controller.previousPage(
+              duration: Duration(microseconds: 10), curve: Curves.easeIn);
+        } else if (state.isNextMonthDay == true) {
+          _controller.nextPage(
+              duration: Duration(microseconds: 10), curve: Curves.easeIn);
+        }
         return Scaffold(
           // print(DateTime.now().toString());
           //print(state.dateTime);
@@ -95,7 +104,7 @@ class CalendarWidget extends StatelessWidget {
                     : SizedBox.shrink(),
                 SizedBox(height: 10.0),
                 PageView(
-                  controller: PageController(initialPage: initialPage),
+                  controller: _controller,
                   onPageChanged: (index) {
                     if (index > oldIndex) {
                       trackPaging = viewByChoice == ViewByChoices.viewByMonth
@@ -127,6 +136,14 @@ class CalendarWidget extends StatelessWidget {
                     context
                         .read<DateChangeCubitDartCubit>()
                         .selectedDate(isSelected: false, index: -1);
+
+                    context.read<DateChangeCubitDartCubit>().isPrevMonthDay(
+                          isPrevMonthDay: false,
+                        );
+
+                    context.read<DateChangeCubitDartCubit>().isNextMonthDay(
+                          isNextMonthDay: false,
+                        );
                   },
                   children: results,
                 ),

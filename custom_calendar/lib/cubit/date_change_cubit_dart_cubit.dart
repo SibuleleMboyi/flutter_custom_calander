@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:custom_calendar/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 
@@ -48,6 +49,24 @@ class DateChangeCubitDartCubit extends Cubit<DateChangeCubitDartState> {
     emit(
       state.copyWith(
         hasPaged: hasPaged,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
+
+  void isPrevMonthDay({required bool isPrevMonthDay}) {
+    emit(
+      state.copyWith(
+        isPrevMonthDay: isPrevMonthDay,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
+
+  void isNextMonthDay({required bool isNextMonthDay}) {
+    emit(
+      state.copyWith(
+        isNextMonthDay: isNextMonthDay,
         status: DateChangeCubitDartStatus.success,
       ),
     );

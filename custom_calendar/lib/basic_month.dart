@@ -217,7 +217,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 }
 
  */
-import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
+
+/* import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -257,10 +258,6 @@ class MonthWidget extends StatelessWidget {
                 crossAxisCount: 7,
               ),
               itemBuilder: (context, index) {
-                int numb = 0;
-                if ((viewPort[1][index])! is Text) {
-                  numb = state.dateTime.day;
-                }
                 return GestureDetector(
                   onTap: () {
                     //Text text = Text('Mandelaaaaaaaaaaaaaaaaaaaaaaa');
@@ -275,12 +272,13 @@ class MonthWidget extends StatelessWidget {
                       print('Oops! out of the END bounds');
                     } else {
                       context.read<DateChangeCubitDartCubit>().selectedDate(
-                            isSelected: true,
-                            index: index,
+                            !state.isSelected,
+                            index,
                           ); // isSelected is initially 'false'. This sets it to 'true.
                       print('seleced state index: ' + index.toString());
-                      context.read<DateChangeCubitDartCubit>().animWidget(
-                              widget: Container(
+                      context
+                          .read<DateChangeCubitDartCubit>()
+                          .animWidget(Container(
                             decoration: BoxDecoration(
                               //color: Colors.yellow,
                               border: Border.all(color: Colors.green),
@@ -289,6 +287,7 @@ class MonthWidget extends StatelessWidget {
                             child: viewPort[1][index],
                           )); //
                     }
+                    print('state date');
                     print(state.selectedDate.day);
 
                     /*   Container(
@@ -300,39 +299,16 @@ class MonthWidget extends StatelessWidget {
                       child: viewPort[1][index],
                     ); */
                   },
-                  child: state.isSelected == false &&
-                          (viewPort[1][index])! is Text &&
-                          state.selectedIndex != -1 &&
-                          numb == state.dateTime.day
-                      ? Container(
-                          decoration: BoxDecoration(
-                            //color: Colors.yellow,
-                            border: Border.all(color: Colors.green),
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: viewPort[1][index],
-                        )
-                      : state.hasPaged == true &&
-                              (viewPort[1][index]).data ==
-                                  state.dateTime.day.toString() &&
-                              state.isSelected == false &&
-                              index < (viewPort[1].length - viewPort[2])
-                          ? Container(
-                              decoration: BoxDecoration(
-                                //color: Colors.yellow,
-                                border: Border.all(color: Colors.green),
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              child: viewPort[1][index],
-                            )
-                          : animatedGridCell(
-                              widget: viewPort[1][index],
-                              animatedWidget: state.animatedWidget,
-                              stateDateTime: state.selectedDate,
-                              isSelected: state.isSelected,
-                              index: index,
-                              stateIndex: state.selectedIndex,
-                            ),
+                  child: (viewPort[1][index]).data == 28
+                      ? state.animatedWidget
+                      : animatedGridCell(
+                          widget: viewPort[1][index],
+                          animatedWidget: state.animatedWidget,
+                          stateDateTime: state.selectedDate,
+                          isSelected: state.isSelected,
+                          index: index,
+                          stateIndex: state.selectedIndex,
+                        ),
                 );
               }),
         );
@@ -346,7 +322,7 @@ class MonthWidget extends StatelessWidget {
     required DateTime stateDateTime,
     required bool isSelected,
     required int index,
-    required int stateIndex,
+    int? stateIndex,
   }) {
     if (index == stateIndex) {
       return animatedWidget;
@@ -397,23 +373,15 @@ class MonthWidget extends StatelessWidget {
       monthCheck.add(
         DateTime(date.year, date.month, index) ==
                 DateTime(currentDate.year, currentDate.month, currentDate.day)
-            ? Wrap(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: trackLen % 7 == 0 ? Colors.red[700] : Colors.green,
-                      borderRadius: BorderRadius.circular(3.0),
-                    ),
-                    child: Text(
-                      index.toString(),
-                      style: TextStyle(
-                        color: textColor == Brightness.light
-                            ? Colors.black
-                            : Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
+            ? Text(
+                index.toString(),
+                style: TextStyle(
+                  color: textColor == Brightness.light
+                      ? trackLen % 7 == 0
+                          ? Colors.white
+                          : Colors.black
+                      : Colors.white,
+                ),
               )
             : Text(
                 index.toString(),
@@ -461,6 +429,5 @@ class MonthWidget extends StatelessWidget {
     ];
   }
 }
-
 
  */
