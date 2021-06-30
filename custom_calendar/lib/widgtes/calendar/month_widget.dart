@@ -46,12 +46,14 @@ class MonthWidget extends StatelessWidget {
               itemBuilder: (context, index) {
                 bool isCurrentMonth = false;
 
-                int i = 0;
-                while (isCurrentMonth == false && i < viewPort[1].length) {
-                  if (viewPort[1][i] is! Text) {
-                    isCurrentMonth = true;
+                if (ViewByChoices.viewByMonth == viewByChoices) {
+                  int i = 0;
+                  while (isCurrentMonth == false && i < viewPort[1].length) {
+                    if (viewPort[1][i] is! Text) {
+                      isCurrentMonth = true;
+                    }
+                    i += 1;
                   }
-                  i += 1;
                 }
                 return GestureDetector(
                   onTap: () => ViewByChoices.viewByMonth == viewByChoices
@@ -183,9 +185,6 @@ class MonthWidget extends StatelessWidget {
     }
     final monthCheck = visiblePrevMonthDays + currentMothDays;
 
-    print(date);
-    print(Constants.currentDate);
-
     int trackLen = 0;
     for (int index = 1; index <= currentMonthNumOfDays; index++) {
       trackLen = monthCheck.length + 1;
@@ -234,7 +233,6 @@ class MonthWidget extends StatelessWidget {
 
     int index = 1;
 
-    print('added next days :::::::::::::::::');
     int viewPortLenght = monthCheck.length;
     int check = 0;
     if (viewByChoices == ViewByChoices.viewByMonth) {

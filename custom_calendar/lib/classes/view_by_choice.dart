@@ -32,7 +32,7 @@ class ViewByChoiceClass {
         textColor: textColor,
       ));
     }
-    print('months lenght :::' + monthsList.length.toString());
+
     return monthsList;
   }
 
@@ -42,8 +42,6 @@ class ViewByChoiceClass {
     for (int index = 0; index < numberOfYears; index++) {
       final dateTime = DateTime(
           backLimitDate.year + index, backLimitDate.month, backLimitDate.day);
-
-      //print('created date :::::::::::: +++' + dateTime.toString());
 
       yearList.add(YearWidget(dateTime: dateTime, textColor: textColor));
     }

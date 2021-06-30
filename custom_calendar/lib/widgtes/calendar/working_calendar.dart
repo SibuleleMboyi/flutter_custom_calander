@@ -1,246 +1,169 @@
+import 'package:custom_calendar/classes/classes.dart';
 import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
-import 'package:custom_calendar/widgtes/widgets.dart';
+import 'package:custom_calendar/widgtes/calendar/viewby_month.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class MonthWidget extends StatelessWidget {
-  final DateTime dateTime;
-  final double mainAxisSpacing;
-  final double crossAxisSpacing;
-  final Brightness textColor;
-  final ViewByChoices viewByChoices;
+class CalendarWidget extends StatefulWidget {
+  final ViewByChoices viewByChoice;
 
-  const MonthWidget(
-      {Key? key,
-      required this.dateTime,
-      this.mainAxisSpacing = 60.0,
-      this.crossAxisSpacing = 10,
-      this.viewByChoices = ViewByChoices.viewByMonth,
-      required this.textColor})
-      : super(key: key);
+  const CalendarWidget({
+    Key? key,
+    this.viewByChoice = ViewByChoices.viewByMonth,
+  }) : super(key: key);
+
+  @override
+  _CalendarWidgetState createState() => _CalendarWidgetState();
+}
+
+class _CalendarWidgetState extends State<CalendarWidget> {
+  DateTime backLimitDate = Constants.backLimitDate;
+  DateTime currentDate = Constants.currentDate;
+  List<String> dayNames = Constants.dayNames;
+
+  int initialPage = 0;
+  int trackPaging = 0;
+  int oldIndex = 0;
+
+  late PageController _controllerYearly;
+
+  void initializeController() {
+    if (widget.viewByChoice == ViewByChoices.viewByMonth) {
+      int x = (currentDate.year - backLimitDate.year) * 12;
+      initialPage = x + currentDate.month - 2;
+    } else {
+      initialPage = currentDate.year - backLimitDate.year;
+    }
+
+    oldIndex = initialPage;
+  }
+
+  @override
+  void dispose() {
+    _controllerYearly.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final viewPort = creatMonth(date: dateTime, textColor: textColor);
+    final checkColor = MediaQuery.platformBrightnessOf(context);
 
+    initializeController();
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(30, 50, 0, 0),
-          child: GridView.builder(
-              shrinkWrap: true,
-              itemCount: viewPort[1].length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisSpacing: mainAxisSpacing,
-                //mainAxisSpacing: 10,
-                crossAxisSpacing: 0,
-                crossAxisCount: 7,
+        _controllerYearly = PageController(
+          initialPage: initialPage,
+        );
+
+        List<Widget> results = ViewByChoiceClass.viewByChoice(
+          choice: widget.viewByChoice,
+          textColor: checkColor,
+        );
+
+        context.read<DateChangeCubitDartCubit>().initPage(
+              initialPage: initialPage,
+            );
+
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0.0,
+            backwardsCompatibility: false,
+            systemOverlayStyle: checkColor == Brightness.dark
+                ? SystemUiOverlayStyle(
+                    statusBarColor: Colors.black,
+                    statusBarIconBrightness: Brightness.light,
+                  )
+                : SystemUiOverlayStyle(
+                    statusBarColor: Colors.grey[200],
+                    statusBarIconBrightness: Brightness.dark,
+                  ),
+            foregroundColor:
+                checkColor == Brightness.light ? Colors.black : Colors.white,
+            backgroundColor: checkColor == Brightness.light
+                ? Colors.grey[200]
+                : Colors.black,
+            title: widget.viewByChoice == ViewByChoices.viewByMonth
+                ? Text(state.dateTime.year.toString() +
+                    ' ' +
+                    DateFormat.MMM().format(state.dateTime))
+                : Text(state.dateTime.year.toString()),
+            leading: Icon(Icons.menu),
+            actions: [Icon(Icons.home)],
+          ),
+          backgroundColor:
+              checkColor == Brightness.light ? Colors.grey[200] : Colors.black,
+          body: Container(
+              decoration: BoxDecoration(
+                color: checkColor == Brightness.light
+                    ? Colors.white
+                    : Colors.white10,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(20.0),
               ),
-              itemBuilder: (context, index) {
-                bool isCurrentMonth = false;
-                /*   if ((viewPort[1][index]) is! Text &&
-                    state.dateTime.day == viewPort[1][index]) {
-                  print('is not the same instance');
-                  
-                } */
+              child: Stack(
+                children: [
+                  widget.viewByChoice == ViewByChoices.viewByYear
+                      ? PageView(
+                          controller: _controllerYearly,
+                          onPageChanged: (index) {
+                            if (index > state.oldIndex) {
+                              trackPaging = state.dateTime.year + 1;
+                            } else {
+                              trackPaging = state.dateTime.year - 1;
+                            }
+                            print(state.oldIndex);
+                            currentDate = DateTime(trackPaging, 01, 01);
 
-                int i = 0;
-                while (isCurrentMonth == false && i < viewPort[1].length) {
-                  if (viewPort[1][i] is! Text) {
-                    isCurrentMonth = true;
-                  }
-                  i += 1;
-                }
-                return GestureDetector(
-                  onTap: () {
-                    if ((index) <= (viewPort[0] - 1)) {
-                      //print('checks if tapping visible previous months days');
-                      context.read<DateChangeCubitDartCubit>().isPrevMonthDay(
-                            isPrevMonthDay: true,
-                          );
-                    } else if ((index) >= (viewPort[1].length - viewPort[2])) {
-                      //print('checks if tapping visible next months days');
-                      context.read<DateChangeCubitDartCubit>().isNextMonthDay(
-                            isNextMonthDay: true,
-                          );
-                    } else {
-                      context.read<DateChangeCubitDartCubit>().selectedDate(
-                            isSelected: true,
-                            index: index,
-                          ); // isSelected is initially 'false'. This sets it to 'true.
+                            context
+                                .read<DateChangeCubitDartCubit>()
+                                .updateOldIndex(value: index);
 
-                      context.read<DateChangeCubitDartCubit>().animWidget(
-                            widget:
-                                SelectedDateMarker(child: viewPort[1][index]),
-                          ); //
-                    }
-                  },
-                  child: state.isSelected == false &&
-                          (viewPort[1][index]) is! Text &&
-                          state.selectedIndex != -1
-                      ? SelectedDateMarker(child: viewPort[1][index])
-                      : state.hasPaged == true &&
-                              ((viewPort[1][index]) is Text) &&
-                              (viewPort[1][index]).data ==
-                                  state.dateTime.day.toString() &&
-                              state.isSelected == false &&
-                              index < (viewPort[1].length - viewPort[2]) &&
-                              isCurrentMonth == false
-                          ? SelectedDateMarker(child: viewPort[1][index])
-                          : state.hasPaged == true &&
-                                  ((viewPort[1][index]) is! Text) &&
-                                  state.isSelected == false &&
-                                  index < (viewPort[1].length - viewPort[2])
-                              ? SelectedDateMarker(child: viewPort[1][index])
-                              : animatedGridCell(
-                                  widget: viewPort[1][index],
-                                  animatedWidget: state.animatedWidget,
-                                  stateDateTime: state.selectedDate,
-                                  isSelected: state.isSelected,
-                                  hasPaged: state.hasPaged,
-                                  isCurrentMonth: isCurrentMonth,
-                                  isInstanceOfText:
-                                      (viewPort[1][index]) is! Text,
-                                  isWithinMonth: index <
-                                      (viewPort[1].length - viewPort[2]),
-                                  index: index,
-                                  stateIndex: state.selectedIndex,
-                                ),
-                );
-              }),
+                            context
+                                .read<DateChangeCubitDartCubit>()
+                                .dateChanged(newDate: currentDate);
+
+                            context
+                                .read<DateChangeCubitDartCubit>()
+                                .selectedDateFix(dateTime: currentDate);
+
+                            context
+                                .read<DateChangeCubitDartCubit>()
+                                .hasPaged(hasPaged: true);
+
+                            context
+                                .read<DateChangeCubitDartCubit>()
+                                .selectedDate(isSelected: false, index: -1);
+
+                            context
+                                .read<DateChangeCubitDartCubit>()
+                                .isPrevMonthDay(
+                                  isPrevMonthDay: false,
+                                );
+
+                            context
+                                .read<DateChangeCubitDartCubit>()
+                                .isNextMonthDay(
+                                  isNextMonthDay: false,
+                                );
+                          },
+                          children: results,
+                        )
+                      : ViewByMonth(
+                          oldIndex: oldIndex,
+                          results: results,
+                          dayNames: dayNames,
+                          currentDate: currentDate,
+                          intialPageInitialization: state.initialPage != 0
+                              ? state.initialPage
+                              : initialPage,
+                        ),
+                ],
+              )),
         );
       },
     );
-  }
-
-  Widget animatedGridCell({
-    required Widget widget,
-    required Widget animatedWidget,
-    required DateTime stateDateTime,
-    required bool isSelected,
-    required int index,
-    required bool hasPaged,
-    required bool isCurrentMonth,
-    required bool isInstanceOfText,
-    required bool isWithinMonth,
-    required int stateIndex,
-  }) {
-    if (index == stateIndex) {
-      return animatedWidget;
-    } else {
-      return widget;
-    }
-  }
-
-  // Create a Month
-  // Appends visible previous month days into the viewport of this month, and color them grey.
-  // Appends visible next month days into the viewport of this month, and color them grey.
-  List<dynamic> creatMonth(
-      {required DateTime date, required Brightness textColor}) {
-    List<Widget> visiblePrevMonthDays = [];
-    List<Widget> visibleNextMonthDays = [];
-    List<Widget> currentMothDays = [];
-
-    final prevMonthLastDate = DateTime(date.year, date.month, 0);
-    String prvMonthNumOfDays = DateFormat.d().format(prevMonthLastDate);
-    int prevMonthNumOfDays = int.parse(prvMonthNumOfDays);
-
-    final currentMonthLastDate = DateTime(date.year, date.month + 1, 0);
-    String currntMonthNumOfDays = DateFormat.d().format(currentMonthLastDate);
-    int currentMonthNumOfDays = int.parse(currntMonthNumOfDays);
-
-    final currentMonthFirstDayNumber =
-        DateTime(date.year, date.month, 01).weekday;
-
-    if (currentMonthFirstDayNumber != 1) {
-      int patchFrom = prevMonthNumOfDays - currentMonthFirstDayNumber + 1;
-      for (int index = 1; index < currentMonthFirstDayNumber; index++) {
-        visiblePrevMonthDays.add(
-          Text(
-            viewByChoices == ViewByChoices.viewByMonth
-                ? (patchFrom + index).toString()
-                : '',
-            style: TextStyle(color: Colors.grey),
-          ),
-        );
-      }
-    }
-    final monthCheck = visiblePrevMonthDays + currentMothDays;
-
-    print(date);
-    print(Constants.currentDate);
-
-    int trackLen = 0;
-    for (int index = 1; index <= currentMonthNumOfDays; index++) {
-      trackLen = monthCheck.length + 1;
-      monthCheck.add(
-        DateTime(date.year, date.month, index) ==
-                DateTime(
-                  Constants.currentDate.year,
-                  Constants.currentDate.month,
-                  Constants.currentDate.day,
-                )
-            ? Wrap(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: trackLen % 7 == 0 ? Colors.red[700] : Colors.green,
-                      borderRadius: BorderRadius.circular(3.0),
-                    ),
-                    child: Text(
-                      index.toString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : Text(
-                index.toString(),
-                style: TextStyle(
-                  color: textColor == Brightness.light
-                      ? trackLen % 7 == 0
-                          ? Colors.red[700]
-                          : Colors.black
-                      : trackLen % 7 == 0
-                          ? Colors.red[700]
-                          : Colors.white,
-                ),
-              ),
-      );
-    }
-
-    int index = 1;
-
-    print('added next days :::::::::::::::::');
-    int viewPortLenght = monthCheck.length;
-    int check = 0;
-    if (viewByChoices == ViewByChoices.viewByMonth) {
-      while (viewPortLenght < 42) {
-        check = viewPortLenght + 1;
-        visibleNextMonthDays.add(
-          check % 7 == 0
-              ? Text(
-                  index.toString(),
-                  style: TextStyle(color: Colors.red[300]),
-                )
-              : Text(
-                  index.toString(),
-                  style: TextStyle(color: Colors.grey),
-                ),
-        );
-        index += 1;
-        viewPortLenght += 1;
-      }
-    }
-
-    return [
-      visiblePrevMonthDays.length,
-      monthCheck + visibleNextMonthDays,
-      visibleNextMonthDays.length
-    ];
   }
 }

@@ -71,4 +71,40 @@ class DateChangeCubitDartCubit extends Cubit<DateChangeCubitDartState> {
       ),
     );
   }
+
+  void viewBy({required ViewByChoices viewByChoices}) {
+    emit(
+      state.copyWith(
+        viewByChoices: viewByChoices,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
+
+  void initPage({required int initialPage}) {
+    emit(
+      state.copyWith(
+        initialPage: initialPage,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
+
+  void currentViewedPage({required double currentViewdPage}) {
+    emit(
+      state.copyWith(
+        currentViewdPage: currentViewdPage,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
+
+  void updateOldIndex({required int value}) {
+    emit(
+      state.copyWith(
+        oldIndex: value,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
 }
