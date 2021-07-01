@@ -1,41 +1,47 @@
-import 'package:custom_calendar/classes/classes.dart';
 import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class FixViewByMonth extends StatefulWidget {
+class ViewByMonth extends StatefulWidget {
   final ViewByChoices viewByChoice;
+  final int intialPageInitialization;
+  final int oldIndex;
+  final List<Widget> results;
+  final List<String> dayNames;
+  final DateTime currentDate;
 
-  const FixViewByMonth({Key? key, required this.viewByChoice})
-      : super(key: key);
+  ViewByMonth({
+    Key? key,
+    this.viewByChoice = ViewByChoices.viewByMonth,
+    required this.intialPageInitialization,
+    required this.oldIndex,
+    required this.results,
+    required this.dayNames,
+    required this.currentDate,
+  }) : super(key: key);
 
   @override
-  _FixViewByMonthState createState() => _FixViewByMonthState();
+  _ViewByMonthState createState() => _ViewByMonthState();
 }
 
-class _FixViewByMonthState extends State<FixViewByMonth> {
-  DateTime backLimitDate = Constants.backLimitDate;
-  DateTime currentDate = Constants.currentDate;
-  List<String> dayNames = Constants.dayNames;
+class _ViewByMonthState extends State<ViewByMonth> {
+  late int initialPage;
+  late PageController _controller = PageController(
+    initialPage: initialPage,
+  );
 
-  int initialPage = 0;
-  int trackPaging = 0;
-  int oldIndex = 0;
-  late PageController _controller;
+/*   void initializeController() {
+    int initialPage = 0;
 
-  void initializeController() {
-    if (widget.viewByChoice == ViewByChoices.viewByMonth) {
-      int x = (currentDate.year - backLimitDate.year) * 12;
-      initialPage = x + currentDate.month - 2;
+    int x = (Constants.currentDate.year - Constants.backLimitDate.year) * 12;
+    initialPage = x + Constants.currentDate.month - 2;
 
-      print(initialPage);
-    } else {
-      initialPage = currentDate.year - backLimitDate.year;
-    }
-    _controller = PageController(initialPage: initialPage);
-    oldIndex = initialPage;
-  }
+    _controller = PageController(
+      initialPage: initialPage,
+    );
+  } */
 
   @override
   void dispose() {
@@ -45,15 +51,13 @@ class _FixViewByMonthState extends State<FixViewByMonth> {
 
   @override
   Widget build(BuildContext context) {
-    //print(ViewByChoices.viewByMonth);
     final checkColor = MediaQuery.platformBrightnessOf(context);
 
-    List<Widget> results = ViewByChoiceClass.viewByChoice(
-      choice: widget.viewByChoice,
-      textColor: checkColor,
-    );
+    int trackPaging = 0;
 
-    initializeController();
+    initialPage = widget.intialPageInitialization;
+    //initializeController();
+
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
         if (state.isPrevMonthDay == true) {
@@ -63,6 +67,7 @@ class _FixViewByMonthState extends State<FixViewByMonth> {
           _controller.nextPage(
               duration: Duration(microseconds: 10), curve: Curves.easeIn);
         }
+
         return Container(
           decoration: BoxDecoration(
             color:
@@ -75,34 +80,44 @@ class _FixViewByMonthState extends State<FixViewByMonth> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
                 child: GridView.builder(
-                    itemCount: dayNames.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 7,
-                    ),
-                    itemBuilder: (context, index) {
-                      return Text(dayNames[index]);
-                    }),
+                  itemCount: widget.dayNames.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 7,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Text(widget.dayNames[index]);
+                  },
+                ),
               ),
               SizedBox(height: 10.0),
               PageView(
                 controller: _controller,
                 onPageChanged: (index) {
-                  if (index > oldIndex) {
-                    trackPaging = currentDate.month + 1;
+                  print('index : ' + index.toString());
+                  print('Oldindex : ' + state.viewByMonthOldIndex.toString());
+
+                  if (index > state.viewByMonthOldIndex) {
+                    trackPaging = state.dateTime.month + 1;
                   } else {
-                    trackPaging = currentDate.month - 1;
+                    trackPaging = state.dateTime.month - 1;
                   }
-                  oldIndex = index;
-                  currentDate = DateTime(currentDate.year, trackPaging, 01);
 
-                  print(trackPaging);
+                  print('trackPaging : ' + trackPaging.toString());
                   context
                       .read<DateChangeCubitDartCubit>()
-                      .dateChanged(newDate: currentDate);
+                      .viewByMonthOldIndex(value: index);
+
+                  final currentDateCopy =
+                      DateTime(state.dateTime.year, trackPaging, 01);
+                  print(currentDateCopy);
 
                   context
                       .read<DateChangeCubitDartCubit>()
-                      .selectedDateFix(dateTime: currentDate);
+                      .dateChanged(newDate: currentDateCopy);
+
+                  context
+                      .read<DateChangeCubitDartCubit>()
+                      .selectedDateFix(dateTime: currentDateCopy);
 
                   context
                       .read<DateChangeCubitDartCubit>()
@@ -120,8 +135,8 @@ class _FixViewByMonthState extends State<FixViewByMonth> {
                         isNextMonthDay: false,
                       );
                 },
-                children: results,
-              ),
+                children: widget.results,
+              )
             ],
           ),
         );

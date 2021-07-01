@@ -1,6 +1,5 @@
 import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
-import 'package:custom_calendar/widgtes/calendar/viewby_month.dart';
 import 'package:custom_calendar/widgtes/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,20 +58,6 @@ class YearWidget extends StatelessWidget {
                 context.read<DateChangeCubitDartCubit>().dateChanged(
                       newDate: DateTime(dateTime.year, index + 1, 01),
                     );
-
-                // TODO create Route for this method to work
-                /*   Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ViewByMonth(
-                      results: [],
-                      dayNames: Constants.dayNames,
-                      oldIndex: 0,
-                      currentDate: dateTime,
-                      intialPageInitialization: initialPage,
-                    ),
-                  ),
-                ); */
               },
               child: month,
             );

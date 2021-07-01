@@ -99,10 +99,19 @@ class DateChangeCubitDartCubit extends Cubit<DateChangeCubitDartState> {
     );
   }
 
-  void updateOldIndex({required int value}) {
+  void viewByMonthOldIndex({required int value}) {
     emit(
       state.copyWith(
-        oldIndex: value,
+        viewByMonthOldIndex: value,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
+
+  void viewByYearOldIndex({required int value}) {
+    emit(
+      state.copyWith(
+        viewByYearOldIndex: value,
         status: DateChangeCubitDartStatus.success,
       ),
     );

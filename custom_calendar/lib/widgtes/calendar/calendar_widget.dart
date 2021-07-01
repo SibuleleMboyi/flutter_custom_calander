@@ -1,7 +1,7 @@
 import 'package:custom_calendar/classes/classes.dart';
 import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
-import 'package:custom_calendar/widgtes/calendar/viewby_month.dart';
+import 'package:custom_calendar/widgtes/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,8 +62,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               initialPage: initialPage,
             );
 
-        // print(state.viewByChoices);
-
         return Scaffold(
           appBar: AppBar(
             elevation: 0.0,
@@ -108,17 +106,18 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                       ? PageView(
                           controller: _controllerYearly,
                           onPageChanged: (index) {
-                            if (index > state.oldIndex) {
+                            if (index > state.viewByYearOldIndex) {
                               trackPaging = state.dateTime.year + 1;
                             } else {
                               trackPaging = state.dateTime.year - 1;
                             }
-                            print(state.oldIndex);
+                            print(state.viewByYearOldIndex);
                             currentDate = DateTime(trackPaging, 01, 01);
+                            print(currentDate);
 
                             context
                                 .read<DateChangeCubitDartCubit>()
-                                .updateOldIndex(value: index);
+                                .viewByYearOldIndex(value: index);
 
                             context
                                 .read<DateChangeCubitDartCubit>()
@@ -160,7 +159,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                                 state.viewByChoices != ViewByChoices.viewByMonth
                                     ? widget.viewByChoice
                                     : state.viewByChoices,
-                            // choice: state.viewByChoices,
                             textColor: checkColor,
                           ),
                           dayNames: dayNames,

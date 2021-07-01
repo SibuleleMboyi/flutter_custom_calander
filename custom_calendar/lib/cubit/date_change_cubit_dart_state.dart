@@ -16,7 +16,8 @@ class DateChangeCubitDartState {
   final int initialPage;
   final double currentViewdPage;
   final DateChangeCubitDartStatus status;
-  final int oldIndex;
+  final int viewByMonthOldIndex;
+  final int viewByYearOldIndex;
 
   DateChangeCubitDartState({
     required this.dateTime,
@@ -31,7 +32,8 @@ class DateChangeCubitDartState {
     required this.initialPage,
     required this.status,
     required this.currentViewdPage,
-    required this.oldIndex,
+    required this.viewByMonthOldIndex,
+    required this.viewByYearOldIndex,
   });
 
   factory DateChangeCubitDartState.initial() {
@@ -48,7 +50,8 @@ class DateChangeCubitDartState {
       initialPage: 0,
       status: DateChangeCubitDartStatus.initial,
       currentViewdPage: 0,
-      oldIndex: 0,
+      viewByMonthOldIndex: 0,
+      viewByYearOldIndex: 0,
     );
   }
 
@@ -65,7 +68,8 @@ class DateChangeCubitDartState {
     int? initialPage,
     DateChangeCubitDartStatus? status,
     double? currentViewdPage,
-    int? oldIndex,
+    int? viewByMonthOldIndex,
+    int? viewByYearOldIndex,
   }) {
     return DateChangeCubitDartState(
       dateTime: dateTime ?? this.dateTime,
@@ -80,7 +84,8 @@ class DateChangeCubitDartState {
       initialPage: initialPage ?? this.initialPage,
       status: status ?? this.status,
       currentViewdPage: currentViewdPage ?? this.currentViewdPage,
-      oldIndex: oldIndex ?? this.oldIndex,
+      viewByMonthOldIndex: viewByMonthOldIndex ?? this.viewByMonthOldIndex,
+      viewByYearOldIndex: viewByYearOldIndex ?? this.viewByYearOldIndex,
     );
   }
 }
