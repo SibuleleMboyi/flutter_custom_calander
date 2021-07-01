@@ -24,8 +24,8 @@ class ViewByChoiceClass {
     List<Widget> monthsList = [];
     int numberOfMonths = (frontLimitDate.year - backLimitDate.year) * 12;
     for (int index = 0; index < numberOfMonths; index++) {
-      final dateTime = DateTime(backLimitDate.year,
-          backLimitDate.month + index + 1, backLimitDate.day);
+      final dateTime = DateTime(
+          backLimitDate.year, backLimitDate.month + index, backLimitDate.day);
 
       monthsList.add(MonthWidget(
         dateTime: dateTime,

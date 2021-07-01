@@ -46,10 +46,10 @@ class YearWidget extends StatelessWidget {
                 context.read<DateChangeCubitDartCubit>().viewBy(
                       viewByChoices: ViewByChoices.viewByMonth,
                     );
+                print(index);
                 int initialPage =
                     ((dateTime.year - Constants.backLimitDate.year) * 12) +
-                        index -
-                        1;
+                        index;
                 context.read<DateChangeCubitDartCubit>().initPage(
                       initialPage: initialPage,
                     );
@@ -61,16 +61,18 @@ class YearWidget extends StatelessWidget {
                     );
 
                 // TODO create Route for this method to work
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ViewByMonth(
-                              results: [],
-                              dayNames: Constants.dayNames,
-                              oldIndex: 0,
-                              currentDate: dateTime,
-                              intialPageInitialization: initialPage,
-                            )));
+                /*   Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ViewByMonth(
+                      results: [],
+                      dayNames: Constants.dayNames,
+                      oldIndex: 0,
+                      currentDate: dateTime,
+                      intialPageInitialization: initialPage,
+                    ),
+                  ),
+                ); */
               },
               child: month,
             );

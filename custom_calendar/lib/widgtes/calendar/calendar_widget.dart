@@ -33,7 +33,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   void initializeController() {
     if (widget.viewByChoice == ViewByChoices.viewByMonth) {
       int x = (currentDate.year - backLimitDate.year) * 12;
-      initialPage = x + currentDate.month - 2;
+      initialPage = x + currentDate.month - 1;
     } else {
       initialPage = currentDate.year - backLimitDate.year;
     }
@@ -58,14 +58,11 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           initialPage: initialPage,
         );
 
-        List<Widget> results = ViewByChoiceClass.viewByChoice(
-          choice: widget.viewByChoice,
-          textColor: checkColor,
-        );
-
         context.read<DateChangeCubitDartCubit>().initPage(
               initialPage: initialPage,
             );
+
+        // print(state.viewByChoices);
 
         return Scaffold(
           appBar: AppBar(
@@ -85,7 +82,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             backgroundColor: checkColor == Brightness.light
                 ? Colors.grey[200]
                 : Colors.black,
-            title: widget.viewByChoice == ViewByChoices.viewByMonth
+            title: widget.viewByChoice == ViewByChoices.viewByMonth ||
+                    state.viewByChoices == ViewByChoices.viewByMonth
                 ? Text(state.dateTime.year.toString() +
                     ' ' +
                     DateFormat.MMM().format(state.dateTime))
@@ -105,7 +103,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               ),
               child: Stack(
                 children: [
-                  widget.viewByChoice == ViewByChoices.viewByYear
+                  widget.viewByChoice == ViewByChoices.viewByYear &&
+                          state.viewByChoices != ViewByChoices.viewByMonth
                       ? PageView(
                           controller: _controllerYearly,
                           onPageChanged: (index) {
@@ -149,11 +148,21 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                                   isNextMonthDay: false,
                                 );
                           },
-                          children: results,
+                          children: ViewByChoiceClass.viewByChoice(
+                            choice: widget.viewByChoice,
+                            textColor: checkColor,
+                          ),
                         )
                       : ViewByMonth(
                           oldIndex: oldIndex,
-                          results: results,
+                          results: ViewByChoiceClass.viewByChoice(
+                            choice:
+                                state.viewByChoices != ViewByChoices.viewByMonth
+                                    ? widget.viewByChoice
+                                    : state.viewByChoices,
+                            // choice: state.viewByChoices,
+                            textColor: checkColor,
+                          ),
                           dayNames: dayNames,
                           currentDate: currentDate,
                           intialPageInitialization: state.initialPage != 0
