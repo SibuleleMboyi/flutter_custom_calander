@@ -198,17 +198,22 @@ class MonthWidget extends StatelessWidget {
             ? Wrap(
                 children: [
                   Container(
+                    height:
+                        ViewByChoices.viewByMonth != viewByChoices ? 15 : 25,
+                    width: ViewByChoices.viewByMonth != viewByChoices ? 15 : 25,
                     decoration: BoxDecoration(
                       color: trackLen % 7 == 0 ? Colors.red[700] : Colors.green,
-                      borderRadius: BorderRadius.circular(3.0),
+                      borderRadius: BorderRadius.circular(4.0),
                     ),
-                    child: Text(
-                      index.toString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: ViewByChoices.viewByMonth == viewByChoices
-                            ? 15
-                            : 10,
+                    child: Center(
+                      child: Text(
+                        index.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ViewByChoices.viewByMonth == viewByChoices
+                              ? 15
+                              : 10,
+                        ),
                       ),
                     ),
                   ),

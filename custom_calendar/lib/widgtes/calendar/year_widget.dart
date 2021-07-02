@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 class YearWidget extends StatelessWidget {
   final DateTime dateTime;
   final Brightness textColor;
-  static int intialPageInitialization = 31;
 
   const YearWidget({
     Key? key,
@@ -42,21 +41,23 @@ class YearWidget extends StatelessWidget {
             final month = yearMonths(dateTime: dateTime)[index];
             return GestureDetector(
               onTap: () {
-                context.read<DateChangeCubitDartCubit>().viewBy(
-                      viewByChoices: ViewByChoices.viewByMonth,
-                    );
-                print(index);
                 int initialPage =
                     ((dateTime.year - Constants.backLimitDate.year) * 12) +
                         index;
+                print(initialPage);
                 context.read<DateChangeCubitDartCubit>().initPage(
                       initialPage: initialPage,
                     );
-
-                intialPageInitialization = initialPage;
+                context.read<DateChangeCubitDartCubit>().viewByMonthOldIndex(
+                      value: initialPage,
+                    );
 
                 context.read<DateChangeCubitDartCubit>().dateChanged(
                       newDate: DateTime(dateTime.year, index + 1, 01),
+                    );
+
+                context.read<DateChangeCubitDartCubit>().viewBy(
+                      viewByChoices: ViewByChoices.viewByMonth,
                     );
               },
               child: month,
@@ -79,7 +80,14 @@ class YearWidget extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(10, 20, 0, 0),
         child: Stack(
           children: [
-            Text(DateFormat.MMMM().format(date)),
+            DateTime(date.year, date.month, 01) ==
+                    DateTime(Constants.currentDate.year,
+                        Constants.currentDate.month, 01)
+                ? Text(
+                    DateFormat.MMMM().format(date),
+                    style: TextStyle(color: Colors.green[400]),
+                  )
+                : Text(DateFormat.MMMM().format(date)),
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: GridView.builder(

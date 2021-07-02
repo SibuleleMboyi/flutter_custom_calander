@@ -116,4 +116,26 @@ class DateChangeCubitDartCubit extends Cubit<DateChangeCubitDartState> {
       ),
     );
   }
+
+  void isResetableViewByMonth({required bool value}) {
+    emit(
+      state.copyWith(
+        isResetableViewByMonth: value,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
+
+  void isResetableViewByYear({required bool value}) {
+    emit(
+      state.copyWith(
+        isResetableViewByYear: value,
+        status: DateChangeCubitDartStatus.success,
+      ),
+    );
+  }
+
+  void reset() {
+    emit(DateChangeCubitDartState.initial());
+  }
 }

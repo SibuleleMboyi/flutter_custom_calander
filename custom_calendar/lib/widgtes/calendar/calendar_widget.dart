@@ -1,4 +1,3 @@
-import 'package:custom_calendar/classes/classes.dart';
 import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
 import 'package:custom_calendar/widgtes/widgets.dart';
@@ -26,9 +25,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
   int initialPage = 0;
   int trackPaging = 0;
-  int oldIndex = 0;
-
-  late PageController _controllerYearly;
 
   void initializeController() {
     if (widget.viewByChoice == ViewByChoices.viewByMonth) {
@@ -37,14 +33,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     } else {
       initialPage = currentDate.year - backLimitDate.year;
     }
-
-    oldIndex = initialPage;
-  }
-
-  @override
-  void dispose() {
-    _controllerYearly.dispose();
-    super.dispose();
   }
 
   @override
@@ -52,16 +40,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     final checkColor = MediaQuery.platformBrightnessOf(context);
 
     initializeController();
+    print('initialPage');
+    print(initialPage);
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
-        _controllerYearly = PageController(
-          initialPage: initialPage,
-        );
-
-        context.read<DateChangeCubitDartCubit>().initPage(
-              initialPage: initialPage,
-            );
-
         return Scaffold(
           appBar: AppBar(
             elevation: 0.0,
@@ -87,88 +69,53 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     DateFormat.MMM().format(state.dateTime))
                 : Text(state.dateTime.year.toString()),
             leading: Icon(Icons.menu),
-            actions: [Icon(Icons.home)],
+            actions: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 20, 10, 10),
+                child: GestureDetector(
+                  onTap: () {
+                    widget.viewByChoice == ViewByChoices.viewByYear &&
+                            state.viewByChoices != ViewByChoices.viewByMonth
+                        ? context
+                            .read<DateChangeCubitDartCubit>()
+                            .isResetableViewByYear(
+                              value: true,
+                            )
+                        : context
+                            .read<DateChangeCubitDartCubit>()
+                            .isResetableViewByMonth(
+                              value: true,
+                            );
+                  },
+                  child: SelectedDateMarker(
+                    child: Center(
+                      child: Text(Constants.currentDate.day.toString()),
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
           backgroundColor:
               checkColor == Brightness.light ? Colors.grey[200] : Colors.black,
           body: Container(
-              decoration: BoxDecoration(
-                color: checkColor == Brightness.light
-                    ? Colors.white
-                    : Colors.white10,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Stack(
-                children: [
-                  widget.viewByChoice == ViewByChoices.viewByYear &&
-                          state.viewByChoices != ViewByChoices.viewByMonth
-                      ? PageView(
-                          controller: _controllerYearly,
-                          onPageChanged: (index) {
-                            if (index > state.viewByYearOldIndex) {
-                              trackPaging = state.dateTime.year + 1;
-                            } else {
-                              trackPaging = state.dateTime.year - 1;
-                            }
-                            print(state.viewByYearOldIndex);
-                            currentDate = DateTime(trackPaging, 01, 01);
-                            print(currentDate);
-
-                            context
-                                .read<DateChangeCubitDartCubit>()
-                                .viewByYearOldIndex(value: index);
-
-                            context
-                                .read<DateChangeCubitDartCubit>()
-                                .dateChanged(newDate: currentDate);
-
-                            context
-                                .read<DateChangeCubitDartCubit>()
-                                .selectedDateFix(dateTime: currentDate);
-
-                            context
-                                .read<DateChangeCubitDartCubit>()
-                                .hasPaged(hasPaged: true);
-
-                            context
-                                .read<DateChangeCubitDartCubit>()
-                                .selectedDate(isSelected: false, index: -1);
-
-                            context
-                                .read<DateChangeCubitDartCubit>()
-                                .isPrevMonthDay(
-                                  isPrevMonthDay: false,
-                                );
-
-                            context
-                                .read<DateChangeCubitDartCubit>()
-                                .isNextMonthDay(
-                                  isNextMonthDay: false,
-                                );
-                          },
-                          children: ViewByChoiceClass.viewByChoice(
-                            choice: widget.viewByChoice,
-                            textColor: checkColor,
-                          ),
-                        )
-                      : ViewByMonth(
-                          oldIndex: oldIndex,
-                          results: ViewByChoiceClass.viewByChoice(
-                            choice:
-                                state.viewByChoices != ViewByChoices.viewByMonth
-                                    ? widget.viewByChoice
-                                    : state.viewByChoices,
-                            textColor: checkColor,
-                          ),
-                          dayNames: dayNames,
-                          currentDate: currentDate,
-                          intialPageInitialization: state.initialPage != 0
-                              ? state.initialPage
-                              : initialPage,
-                        ),
-                ],
-              )),
+            decoration: BoxDecoration(
+              color: checkColor == Brightness.light
+                  ? Colors.white
+                  : Colors.white10,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: widget.viewByChoice == ViewByChoices.viewByYear &&
+                    state.viewByChoices != ViewByChoices.viewByMonth
+                ? ViewByYear(initialPage: initialPage, checkColor: checkColor)
+                : ViewByMonth(
+                    checkColor: checkColor,
+                    initialPage: state.initialPage != 0
+                        ? state.initialPage
+                        : initialPage,
+                  ),
+          ),
         );
       },
     );

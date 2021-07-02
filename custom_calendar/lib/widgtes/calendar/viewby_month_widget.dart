@@ -1,25 +1,18 @@
+import 'package:custom_calendar/classes/classes.dart';
 import 'package:custom_calendar/cubit/date_change_cubit_dart_cubit.dart';
 import 'package:custom_calendar/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ViewByMonth extends StatefulWidget {
-  final ViewByChoices viewByChoice;
-  final int intialPageInitialization;
-  final int oldIndex;
-  final List<Widget> results;
-  final List<String> dayNames;
-  final DateTime currentDate;
+  final int initialPage;
+
+  final Brightness checkColor;
 
   ViewByMonth({
     Key? key,
-    this.viewByChoice = ViewByChoices.viewByMonth,
-    required this.intialPageInitialization,
-    required this.oldIndex,
-    required this.results,
-    required this.dayNames,
-    required this.currentDate,
+    required this.initialPage,
+    required this.checkColor,
   }) : super(key: key);
 
   @override
@@ -27,21 +20,16 @@ class ViewByMonth extends StatefulWidget {
 }
 
 class _ViewByMonthState extends State<ViewByMonth> {
-  late int initialPage;
+  List<String> dayNames = Constants.dayNames;
+
   late PageController _controller = PageController(
-    initialPage: initialPage,
+    initialPage: widget.initialPage,
   );
 
-/*   void initializeController() {
-    int initialPage = 0;
-
-    int x = (Constants.currentDate.year - Constants.backLimitDate.year) * 12;
-    initialPage = x + Constants.currentDate.month - 2;
-
-    _controller = PageController(
-      initialPage: initialPage,
-    );
-  } */
+  late List<Widget> results = ViewByChoiceClass.viewByChoice(
+    choice: ViewByChoices.viewByMonth,
+    textColor: widget.checkColor,
+  );
 
   @override
   void dispose() {
@@ -51,94 +39,93 @@ class _ViewByMonthState extends State<ViewByMonth> {
 
   @override
   Widget build(BuildContext context) {
-    final checkColor = MediaQuery.platformBrightnessOf(context);
-
     int trackPaging = 0;
 
-    initialPage = widget.intialPageInitialization;
-    //initializeController();
+    //initPage = widget.initialPage;
 
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
+        context
+            .read<DateChangeCubitDartCubit>()
+            .viewByMonthOldIndex(value: widget.initialPage);
+
         if (state.isPrevMonthDay == true) {
           _controller.previousPage(
               duration: Duration(microseconds: 10), curve: Curves.easeIn);
         } else if (state.isNextMonthDay == true) {
           _controller.nextPage(
               duration: Duration(microseconds: 10), curve: Curves.easeIn);
+        } else if (state.isResetableViewByMonth == true) {
+          _controller.animateToPage(_controller.initialPage,
+              duration: Duration(microseconds: 100),
+              curve: Curves.fastOutSlowIn);
+
+          context.read<DateChangeCubitDartCubit>().reset();
         }
 
-        return Container(
-          decoration: BoxDecoration(
-            color:
-                checkColor == Brightness.light ? Colors.white : Colors.white10,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
-                child: GridView.builder(
-                  itemCount: widget.dayNames.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 7,
-                  ),
-                  itemBuilder: (context, index) {
-                    return Text(widget.dayNames[index]);
-                  },
+        return Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
+              child: GridView.builder(
+                itemCount: dayNames.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 7,
                 ),
-              ),
-              SizedBox(height: 10.0),
-              PageView(
-                controller: _controller,
-                onPageChanged: (index) {
-                  print('index : ' + index.toString());
-                  print('Oldindex : ' + state.viewByMonthOldIndex.toString());
-
-                  if (index > state.viewByMonthOldIndex) {
-                    trackPaging = state.dateTime.month + 1;
-                  } else {
-                    trackPaging = state.dateTime.month - 1;
-                  }
-
-                  print('trackPaging : ' + trackPaging.toString());
-                  context
-                      .read<DateChangeCubitDartCubit>()
-                      .viewByMonthOldIndex(value: index);
-
-                  final currentDateCopy =
-                      DateTime(state.dateTime.year, trackPaging, 01);
-                  print(currentDateCopy);
-
-                  context
-                      .read<DateChangeCubitDartCubit>()
-                      .dateChanged(newDate: currentDateCopy);
-
-                  context
-                      .read<DateChangeCubitDartCubit>()
-                      .selectedDateFix(dateTime: currentDateCopy);
-
-                  context
-                      .read<DateChangeCubitDartCubit>()
-                      .hasPaged(hasPaged: true);
-
-                  context
-                      .read<DateChangeCubitDartCubit>()
-                      .selectedDate(isSelected: false, index: -1);
-
-                  context.read<DateChangeCubitDartCubit>().isPrevMonthDay(
-                        isPrevMonthDay: false,
-                      );
-
-                  context.read<DateChangeCubitDartCubit>().isNextMonthDay(
-                        isNextMonthDay: false,
-                      );
+                itemBuilder: (context, index) {
+                  return Text(dayNames[index]);
                 },
-                children: widget.results,
-              )
-            ],
-          ),
+              ),
+            ),
+            SizedBox(height: 10.0),
+            PageView(
+              controller: _controller,
+              onPageChanged: (index) {
+                print('index : ' + index.toString());
+                print('Oldindex : ' + state.viewByMonthOldIndex.toString());
+
+                if (index > state.viewByMonthOldIndex) {
+                  trackPaging = state.dateTime.month + 1;
+                } else {
+                  trackPaging = state.dateTime.month - 1;
+                }
+
+                print('trackPaging : ' + trackPaging.toString());
+                context
+                    .read<DateChangeCubitDartCubit>()
+                    .viewByMonthOldIndex(value: index);
+
+                final currentDateCopy =
+                    DateTime(state.dateTime.year, trackPaging, 01);
+                print(currentDateCopy);
+
+                context
+                    .read<DateChangeCubitDartCubit>()
+                    .dateChanged(newDate: currentDateCopy);
+
+                context
+                    .read<DateChangeCubitDartCubit>()
+                    .selectedDateFix(dateTime: currentDateCopy);
+
+                context
+                    .read<DateChangeCubitDartCubit>()
+                    .hasPaged(hasPaged: true);
+
+                context
+                    .read<DateChangeCubitDartCubit>()
+                    .selectedDate(isSelected: false, index: -1);
+
+                context.read<DateChangeCubitDartCubit>().isPrevMonthDay(
+                      isPrevMonthDay: false,
+                    );
+
+                context.read<DateChangeCubitDartCubit>().isNextMonthDay(
+                      isNextMonthDay: false,
+                    );
+              },
+              children: results,
+            )
+          ],
         );
       },
     );
