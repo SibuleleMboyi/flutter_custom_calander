@@ -26,6 +26,8 @@ class _ViewByMonthState extends State<ViewByMonth> {
     initialPage: widget.initialPage,
   );
 
+  late int prevIndex = widget.initialPage;
+
   late List<Widget> results = ViewByChoiceClass.viewByChoice(
     choice: ViewByChoices.viewByMonth,
     textColor: widget.checkColor,
@@ -45,9 +47,9 @@ class _ViewByMonthState extends State<ViewByMonth> {
 
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
-        context
+        /*  context
             .read<DateChangeCubitDartCubit>()
-            .viewByMonthOldIndex(value: widget.initialPage);
+            .viewByMonthOldIndex(value: widget.initialPage); */
 
         if (state.isPrevMonthDay == true) {
           _controller.previousPage(
@@ -73,7 +75,12 @@ class _ViewByMonthState extends State<ViewByMonth> {
                   crossAxisCount: 7,
                 ),
                 itemBuilder: (context, index) {
-                  return Text(dayNames[index]);
+                  return Text(
+                    dayNames[index],
+                    style: TextStyle(
+                      color: index == 6 ? Colors.red[700] : Colors.white,
+                    ),
+                  );
                 },
               ),
             ),
@@ -82,18 +89,16 @@ class _ViewByMonthState extends State<ViewByMonth> {
               controller: _controller,
               onPageChanged: (index) {
                 print('index : ' + index.toString());
-                print('Oldindex : ' + state.viewByMonthOldIndex.toString());
+                print('Oldindex : ' + prevIndex.toString());
 
-                if (index > state.viewByMonthOldIndex) {
+                if (index > prevIndex) {
                   trackPaging = state.dateTime.month + 1;
                 } else {
                   trackPaging = state.dateTime.month - 1;
                 }
+                prevIndex = index;
 
                 print('trackPaging : ' + trackPaging.toString());
-                context
-                    .read<DateChangeCubitDartCubit>()
-                    .viewByMonthOldIndex(value: index);
 
                 final currentDateCopy =
                     DateTime(state.dateTime.year, trackPaging, 01);

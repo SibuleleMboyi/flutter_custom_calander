@@ -18,6 +18,7 @@ class ViewByYear extends StatefulWidget {
 
 class _ViewByYearState extends State<ViewByYear> {
   int trackPaging = 0;
+  late int prevIndex = widget.initialPage;
 
   late PageController _controller = PageController(
     initialPage: widget.initialPage,
@@ -31,10 +32,6 @@ class _ViewByYearState extends State<ViewByYear> {
   Widget build(BuildContext context) {
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
-        context.read<DateChangeCubitDartCubit>().viewByYearOldIndex(
-              value: widget.initialPage,
-            );
-
         if (state.isResetableViewByYear == true) {
           print(_controller.initialPage);
           _controller.animateToPage(_controller.initialPage,
@@ -47,18 +44,14 @@ class _ViewByYearState extends State<ViewByYear> {
         return PageView(
           controller: _controller,
           onPageChanged: (index) {
-            if (index > state.viewByYearOldIndex) {
+            if (index > prevIndex) {
               trackPaging = state.dateTime.year + 1;
             } else {
               trackPaging = state.dateTime.year - 1;
             }
-            print(state.viewByYearOldIndex);
+            print(prevIndex);
             DateTime currentDate = DateTime(trackPaging, 01, 01);
             print(currentDate);
-
-            context
-                .read<DateChangeCubitDartCubit>()
-                .viewByYearOldIndex(value: index);
 
             context
                 .read<DateChangeCubitDartCubit>()

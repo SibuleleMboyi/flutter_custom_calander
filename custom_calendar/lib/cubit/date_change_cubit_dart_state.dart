@@ -16,8 +16,7 @@ class DateChangeCubitDartState {
   final int initialPage;
   final double currentViewdPage;
   final DateChangeCubitDartStatus status;
-  final int viewByMonthOldIndex;
-  final int viewByYearOldIndex;
+
   final bool isResetableViewByMonth;
   final bool isResetableViewByYear;
 
@@ -34,8 +33,6 @@ class DateChangeCubitDartState {
     required this.initialPage,
     required this.status,
     required this.currentViewdPage,
-    required this.viewByMonthOldIndex,
-    required this.viewByYearOldIndex,
     required this.isResetableViewByMonth,
     required this.isResetableViewByYear,
   });
@@ -54,8 +51,7 @@ class DateChangeCubitDartState {
       initialPage: 0,
       status: DateChangeCubitDartStatus.initial,
       currentViewdPage: 0,
-      viewByMonthOldIndex: 0,
-      viewByYearOldIndex: 0,
+
       isResetableViewByMonth: false,
       isResetableViewByYear: false,
     );
@@ -74,8 +70,6 @@ class DateChangeCubitDartState {
     int? initialPage,
     DateChangeCubitDartStatus? status,
     double? currentViewdPage,
-    int? viewByMonthOldIndex,
-    int? viewByYearOldIndex,
     bool? isResetableViewByMonth,
     bool? isResetableViewByYear,
   }) {
@@ -92,8 +86,6 @@ class DateChangeCubitDartState {
       initialPage: initialPage ?? this.initialPage,
       status: status ?? this.status,
       currentViewdPage: currentViewdPage ?? this.currentViewdPage,
-      viewByMonthOldIndex: viewByMonthOldIndex ?? this.viewByMonthOldIndex,
-      viewByYearOldIndex: viewByYearOldIndex ?? this.viewByYearOldIndex,
       isResetableViewByMonth:
           isResetableViewByMonth ?? this.isResetableViewByMonth,
       isResetableViewByYear:

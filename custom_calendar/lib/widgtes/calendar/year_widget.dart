@@ -91,23 +91,25 @@ class YearWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: dayNames.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    //childAspectRatio: ,
-                    crossAxisSpacing: 1,
-                    //mainAxisExtent: 20,
-                    crossAxisCount: 7,
-                  ),
-                  itemBuilder: (context, index) {
-                    return Text(
-                      dayNames[index],
-                      style: TextStyle(
-                        fontSize: 10,
-                      ),
-                    );
-                  }),
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: dayNames.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  //childAspectRatio: ,
+                  crossAxisSpacing: 1,
+                  //mainAxisExtent: 20,
+                  crossAxisCount: 7,
+                ),
+                itemBuilder: (context, index) {
+                  return Text(
+                    dayNames[index],
+                    style: TextStyle(
+                      color: index == 6 ? Colors.red[700] : Colors.white,
+                      fontSize: 10,
+                    ),
+                  );
+                },
+              ),
             ),
             MonthWidget(
               dateTime: date,
