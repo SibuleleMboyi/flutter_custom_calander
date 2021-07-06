@@ -7,20 +7,20 @@ class ViewByChoiceClass {
   static DateTime frontLimitDate = Constants.frontLimitDate;
 
   static List<Widget> viewByChoice(
-      {required ViewByChoices choice, required Brightness textColor}) {
+      {required ViewByChoices choice, required BuildContext context}) {
     switch (choice) {
       case ViewByChoices.viewByMonth:
-        return viewByMonth(textColor: textColor);
+        return viewByMonth(context: context);
 
       case ViewByChoices.viewByYear:
-        return viewByYear(textColor: textColor);
+        return viewByYear(context: context);
 
       default:
         return [];
     }
   }
 
-  static List<Widget> viewByMonth({required Brightness textColor}) {
+  static List<Widget> viewByMonth({required BuildContext context}) {
     List<Widget> monthsList = [];
     int numberOfMonths = (frontLimitDate.year - backLimitDate.year) * 12;
     for (int index = 0; index < numberOfMonths; index++) {
@@ -29,21 +29,21 @@ class ViewByChoiceClass {
 
       monthsList.add(MonthWidget(
         dateTime: dateTime,
-        textColor: textColor,
+        context: context,
       ));
     }
 
     return monthsList;
   }
 
-  static List<Widget> viewByYear({required Brightness textColor}) {
+  static List<Widget> viewByYear({required BuildContext context}) {
     List<Widget> yearList = [];
     int numberOfYears = (frontLimitDate.year - backLimitDate.year);
     for (int index = 0; index < numberOfYears; index++) {
       final dateTime = DateTime(
           backLimitDate.year + index, backLimitDate.month, backLimitDate.day);
 
-      yearList.add(YearWidget(dateTime: dateTime, textColor: textColor));
+      yearList.add(YearWidget(dateTime: dateTime, context: context));
     }
 
     return yearList;

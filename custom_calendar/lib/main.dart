@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       ),
       home: BlocProvider<DateChangeCubitDartCubit>(
         create: (_) => DateChangeCubitDartCubit(),
-        child: CalendarWidget(viewByChoice: ViewByChoices.viewByYear),
+        child: CalendarWidget(viewByChoice: ViewByChoices.viewByMonth),
       ),
     );
   }

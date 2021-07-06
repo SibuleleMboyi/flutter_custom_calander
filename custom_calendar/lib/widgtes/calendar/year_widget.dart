@@ -7,12 +7,12 @@ import 'package:intl/intl.dart';
 
 class YearWidget extends StatelessWidget {
   final DateTime dateTime;
-  final Brightness textColor;
+  final BuildContext context;
 
   const YearWidget({
     Key? key,
     required this.dateTime,
-    required this.textColor,
+    required this.context,
   }) : super(key: key);
 
   @override
@@ -116,7 +116,7 @@ class YearWidget extends StatelessWidget {
               mainAxisSpacing: 0,
               topPadding: 40,
               leftPadding: 0,
-              textColor: textColor,
+              context: context,
               crossAxisSpacing: 5,
               viewByChoices: ViewByChoices.viewByYear,
             ),

@@ -30,7 +30,7 @@ class _ViewByMonthState extends State<ViewByMonth> {
 
   late List<Widget> results = ViewByChoiceClass.viewByChoice(
     choice: ViewByChoices.viewByMonth,
-    textColor: widget.checkColor,
+    context: context,
   );
 
   @override

@@ -11,7 +11,7 @@ class MonthWidget extends StatelessWidget {
   final double crossAxisSpacing;
   final double leftPadding;
   final double topPadding;
-  final Brightness textColor;
+  final BuildContext context;
   final ViewByChoices viewByChoices;
 
   const MonthWidget({
@@ -22,13 +22,16 @@ class MonthWidget extends StatelessWidget {
     this.leftPadding = 30,
     this.topPadding = 50,
     this.viewByChoices = ViewByChoices.viewByMonth,
-    required this.textColor,
+    required this.context,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final viewPort = creatMonth(
-        date: dateTime, textColor: textColor, viewByChoices: viewByChoices);
+      date: dateTime,
+      context: context,
+      viewByChoices: viewByChoices,
+    );
 
     return BlocBuilder<DateChangeCubitDartCubit, DateChangeCubitDartState>(
       builder: (context, state) {
@@ -153,11 +156,12 @@ class MonthWidget extends StatelessWidget {
   // Appends visible next month days into the viewport of this month, and color them grey.
   List<dynamic> creatMonth(
       {required DateTime date,
-      required Brightness textColor,
+      required BuildContext context,
       required ViewByChoices viewByChoices}) {
     List<Widget> visiblePrevMonthDays = [];
     List<Widget> visibleNextMonthDays = [];
     List<Widget> currentMothDays = [];
+    final brightness = MediaQuery.platformBrightnessOf(context);
 
     final prevMonthLastDate = DateTime(date.year, date.month, 0);
     String prvMonthNumOfDays = DateFormat.d().format(prevMonthLastDate);
@@ -224,7 +228,7 @@ class MonthWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize:
                       ViewByChoices.viewByMonth == viewByChoices ? 15 : 10,
-                  color: textColor == Brightness.light
+                  color: brightness == Brightness.light
                       ? trackLen % 7 == 0
                           ? Colors.red[700]
                           : Colors.black

@@ -25,7 +25,7 @@ class _ViewByYearState extends State<ViewByYear> {
   );
   late List<Widget> results = ViewByChoiceClass.viewByChoice(
     choice: ViewByChoices.viewByYear,
-    textColor: widget.checkColor,
+    context: context,
   );
 
   @override
